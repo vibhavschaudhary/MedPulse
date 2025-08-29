@@ -7,7 +7,7 @@ app = Flask(__name__)
 # --- Load the Trained Model ---
 # Make sure 'triage_model.pkl' is in the same folder as this script
 try:
-    model = joblib.load('S:\Projects\MedPulse\Triage_model.pkl')
+    model = joblib.load('S:\Projects\MedPulse\Backend\ML\Triage_model.pkl')
     print("Model loaded successfully.")
 except FileNotFoundError:
     print("Model file not found. Make sure 'triage_model.pkl' is in the directory.")
