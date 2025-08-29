@@ -8,7 +8,7 @@ from sklearn.preprocessing import LabelEncoder
 import joblib
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.metrics import accuracy_score, classification_report
-df = pd.read_csv('S:\Projects\MedPulse\Backend\ML\synthetic_triage_data.csv')
+df = pd.read_csv(r'S:\Projects\MedPulse\Backend\ML\dataSets\synthetic_triage_data.csv')
 class DataProcessor:
     def __init__(self, dataframe: pd.DataFrame):
         self.df = dataframe.copy()

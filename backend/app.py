@@ -4,47 +4,33 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# --- Load the Trained Model ---
-# Make sure 'triage_model.pkl' is in the same folder as this script
+# Load the trained model
 try:
-    model = joblib.load('S:\Projects\MedPulse\Backend\ML\Triage_model.pkl')
+    model = joblib.load(r'triage_model.pkl')
+    # Load the severity mapping needed for the disease model
+    df_severity = pd.read_csv('ML/Symptom-severity.csv')
+    df_severity['Symptom'] = df_severity['Symptom'].str.strip().str.replace(' ', '_')
+    symptom_to_severity = dict(zip(df_severity['Symptom'], df_severity['weight']))
     print("Model loaded successfully.")
 except FileNotFoundError:
-    print("Model file not found. Make sure 'triage_model.pkl' is in the directory.")
-    model = None
+    print("ERROR: triage_model.pkl not found. Please run train_model.py first.")
+    exit()
 
-# --- Define the Features (must match the model training) ---
 features = [
-    'age', 'gender', 'chest pain type', 'blood pressure',
-    'cholesterol', 'max heart rate', 'exercise angina',
-    'plasma glucose', 'hypertension', 'heart_disease'
+    'age', 'gender', 'chest pain type', 'blood pressure', 'cholesterol', 
+    'max heart rate', 'exercise angina', 'plasma glucose', 'hypertension', 'heart_disease'
 ]
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict_triage', methods=['POST'])
 def predict():
-    if model is None:
-        return jsonify({'error': 'Model not loaded'}), 500
-
-    # Get the JSON data from the request
     data = request.get_json()
-    if data is None:
-        return jsonify({'error': 'Invalid JSON input'}), 400
-
-    # Convert the JSON data into a pandas DataFrame
     try:
         patient_df = pd.DataFrame([data], columns=features)
-    except Exception as e:
-        return jsonify({'error': f'Error creating DataFrame: {e}'}), 400
-
-    # Make a prediction
-    try:
         prediction = model.predict(patient_df)
+        return jsonify({'prediction': prediction[0]})
     except Exception as e:
-        return jsonify({'error': f'Error making prediction: {e}'}), 500
-
-    # Return the prediction as a JSON response
-    return jsonify({'prediction': prediction[0]})
+        return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
-    # Runs the Flask app on your local machine
-    app.run(debug=True, port=5000)
+    print("Starting Flask server... You can now test with Postman.")
+    app.run(debug=False, port=5000)
